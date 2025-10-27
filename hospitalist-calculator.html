@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospitalist Work Units Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        body.light {
+            background-color: #f9fafb;
+            color: #111827;
+        }
+
+        body.dark {
+            background-color: #111827;
+            color: #f9fafb;
+        }
+
+        .container {
+            max-width: 42rem;
+            margin: 0 auto;
+            padding: 1rem;
+            padding-bottom: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .icon-btn {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+        }
+
+        body.light .icon-btn {
+            background: white;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark .icon-btn {
+            background: #1f2937;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .icon-btn:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .card {
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        body.light .card {
+            background: white;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark .card {
+            background: #1f2937;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .number-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .number-display {
+            font-size: 2.25rem;
+            font-weight: bold;
+            color: #2563eb;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        body.dark .number-display {
+            color: #60a5fa;
+        }
+
+        .control-btn {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        body.light .control-btn {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        body.dark .control-btn {
+            background: #374151;
+            color: #d1d5db;
+        }
+
+        body.light .control-btn:hover {
+            background: #e5e7eb;
+        }
+
+        body.dark .control-btn:hover {
+            background: #4b5563;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            color: white;
+        }
+
+        .btn-blue {
+            background: #2563eb;
+        }
+
+        .btn-blue:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-green {
+            background: #16a34a;
+        }
+
+        .btn-green:hover {
+            background: #15803d;
+        }
+
+        .btn-gray {
+            background: #4b5563;
+        }
+
+        .btn-gray:hover {
+            background: #374151;
+        }
+
+        .physician-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .physician-btn {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        body.light .physician-btn {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        body.dark .physician-btn {
+            background: #374151;
+            color: #d1d5db;
+        }
+
+        .physician-btn.selected {
+            background: #9333ea;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        body.light .physician-btn:not(.selected):hover {
+            background: #e5e7eb;
+        }
+
+        body.dark .physician-btn:not(.selected):hover {
+            background: #4b5563;
+        }
+
+        .info-text {
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        body.light .info-text {
+            color: #6b7280;
+        }
+
+        body.dark .info-text {
+            color: #9ca3af;
+        }
+
+        .unit-input-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .unit-label {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        body.light .unit-label {
+            color: #374151;
+        }
+
+        body.dark .unit-label {
+            color: #d1d5db;
+        }
+
+        .badge {
+            margin-left: 0.5rem;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+
+        .badge-purple {
+            background: #f3e8ff;
+            color: #7e22ce;
+        }
+
+        body.dark .badge-purple {
+            background: #581c87;
+            color: #e9d5ff;
+        }
+
+        .unit-input {
+            width: 5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        body.light .unit-input {
+            background: white;
+            border-color: #d1d5db;
+            color: #111827;
+        }
+
+        body.dark .unit-input {
+            background: #374151;
+            border-color: #4b5563;
+            color: #f9fafb;
+        }
+
+        .unit-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .unit-max {
+            font-size: 0.875rem;
+        }
+
+        body.light .unit-max {
+            color: #6b7280;
+        }
+
+        body.dark .unit-max {
+            color: #9ca3af;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary-card {
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .summary-card.blue {
+            background: #eff6ff;
+        }
+
+        body.dark .summary-card.blue {
+            background: rgba(37, 99, 235, 0.2);
+        }
+
+        .summary-card.green {
+            background: #f0fdf4;
+        }
+
+        body.dark .summary-card.green {
+            background: rgba(22, 163, 74, 0.2);
+        }
+
+        .summary-card.purple {
+            background: #faf5ff;
+        }
+
+        body.dark .summary-card.purple {
+            background: rgba(147, 51, 234, 0.2);
+        }
+
+        .summary-card.orange {
+            background: #fff7ed;
+        }
+
+        body.dark .summary-card.orange {
+            background: rgba(249, 115, 22, 0.2);
+        }
+
+        .summary-label {
+            font-size: 0.875rem;
+        }
+
+        body.light .summary-label {
+            color: #6b7280;
+        }
+
+        body.dark .summary-label {
+            color: #9ca3af;
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        body.light .summary-value {
+            color: #111827;
+        }
+
+        body.dark .summary-value {
+            color: #f9fafb;
+        }
+
+        .summary-note {
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        body.light .summary-note {
+            color: #6b7280;
+        }
+
+        body.dark .summary-note {
+            color: #9ca3af;
+        }
+
+        .alert {
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .alert-yellow {
+            background: #fefce8;
+            border: 1px solid #fde047;
+            color: #854d0e;
+        }
+
+        body.dark .alert-yellow {
+            background: rgba(234, 179, 8, 0.2);
+            border-color: #a16207;
+            color: #fef08a;
+        }
+
+        .alert-red {
+            background: #fef2f2;
+            border: 2px solid #fca5a5;
+            color: #991b1b;
+        }
+
+        body.dark .alert-red {
+            background: rgba(220, 38, 38, 0.2);
+            border-color: #dc2626;
+            color: #fecaca;
+        }
+
+        .distribution-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .distribution-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .distribution-item.purple {
+            background: #faf5ff;
+            border: 1px solid #e9d5ff;
+        }
+
+        body.dark .distribution-item.purple {
+            background: rgba(147, 51, 234, 0.2);
+            border-color: #7e22ce;
+        }
+
+        .distribution-item.green {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+
+        body.dark .distribution-item.green {
+            background: rgba(22, 163, 74, 0.2);
+            border-color: #16a34a;
+        }
+
+        .distribution-item.red {
+            background: #fef2f2;
+            border: 2px solid #fca5a5;
+        }
+
+        body.dark .distribution-item.red {
+            background: rgba(220, 38, 38, 0.2);
+            border-color: #dc2626;
+        }
+
+        .distribution-item.orange {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+        }
+
+        body.dark .distribution-item.orange {
+            background: rgba(249, 115, 22, 0.2);
+            border-color: #f97316;
+        }
+
+        .distribution-item.gray {
+            background: #f9fafb;
+        }
+
+        body.dark .distribution-item.gray {
+            background: rgba(55, 65, 81, 0.5);
+        }
+
+        .physician-name {
+            font-weight: 600;
+        }
+
+        body.light .physician-name {
+            color: #111827;
+        }
+
+        body.dark .physician-name {
+            color: #f9fafb;
+        }
+
+        .badge-red {
+            background: #ef4444;
+            color: white;
+            font-weight: 600;
+        }
+
+        .badge-orange {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+
+        body.dark .badge-orange {
+            background: #9a3412;
+            color: #fed7aa;
+        }
+
+        .unit-change {
+            font-size: 0.875rem;
+        }
+
+        body.light .unit-change {
+            color: #6b7280;
+        }
+
+        body.dark .unit-change {
+            color: #9ca3af;
+        }
+
+        .unit-change strong {
+            color: #111827;
+        }
+
+        body.dark .unit-change strong {
+            color: #f9fafb;
+        }
+
+        .over-capacity-text {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        body.dark .over-capacity-text {
+            color: #f87171;
+        }
+
+        .patient-count {
+            text-align: right;
+        }
+
+        .patient-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        body.light .patient-number {
+            color: #111827;
+        }
+
+        body.dark .patient-number {
+            color: #f9fafb;
+        }
+
+        .patient-number.red {
+            color: #dc2626;
+        }
+
+        body.dark .patient-number.red {
+            color: #f87171;
+        }
+
+        .patient-label {
+            font-size: 0.75rem;
+        }
+
+        body.light .patient-label {
+            color: #6b7280;
+        }
+
+        body.dark .patient-label {
+            color: #9ca3af;
+        }
+
+        .no-admits {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #7e22ce;
+        }
+
+        body.dark .no-admits {
+            color: #e9d5ff;
+        }
+
+        .near-max-text {
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            color: #ea580c;
+        }
+
+        body.dark .near-max-text {
+            color: #fb923c;
+        }
+
+        .history-item {
+            border-left: 4px solid;
+            padding-left: 0.75rem;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .history-item.blue {
+            border-color: #2563eb;
+        }
+
+        .history-item.red {
+            border-color: #ef4444;
+        }
+
+        .history-date {
+            font-size: 0.875rem;
+        }
+
+        body.light .history-date {
+            color: #6b7280;
+        }
+
+        body.dark .history-date {
+            color: #9ca3af;
+        }
+
+        .history-summary {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        body.light .history-summary {
+            color: #111827;
+        }
+
+        body.dark .history-summary {
+            color: #f9fafb;
+        }
+
+        .history-details {
+            font-size: 0.75rem;
+        }
+
+        body.light .history-details {
+            color: #6b7280;
+        }
+
+        body.dark .history-details {
+            color: #9ca3af;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+    </style>
+</head>
+<body class="light">
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Hospitalist Work Units</h1>
+            <div class="header-buttons">
+                <button class="icon-btn" id="historyBtn" onclick="toggleHistory()">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </button>
+                <button class="icon-btn" id="darkModeBtn" onclick="toggleDarkMode()">
+                    <svg id="moonIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                    </svg>
+                    <svg id="sunIcon" class="hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- History View -->
+        <div id="historyView" class="card hidden">
+            <h2>Last 7 Days</h2>
+            <div id="historyList"></div>
+        </div>
+
+        <!-- Step 1: Number of Physicians -->
+        <div id="step1" class="card">
+            <h2>How many physicians are on today?</h2>
+            <div class="number-control">
+                <button class="control-btn" onclick="changePhysicianCount(-1)">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                    </svg>
+                </button>
+                <div class="number-display" id="physicianCount">4</div>
+                <button class="control-btn" onclick="changePhysicianCount(1)">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                </button>
+            </div>
+            <button class="btn-primary btn-blue" onclick="goToStep2()">Continue</button>
+        </div>
+
+        <!-- Step 2: Select Evening Physician -->
+        <div id="step2" class="card hidden">
+            <h2>Who is the evening physician?</h2>
+            <p class="info-text">This physician will NOT receive morning admissions (they'll handle 3-4 evening admissions)</p>
+            <div class="physician-grid" id="eveningPhysicianGrid"></div>
+            <button class="btn-primary btn-blue" id="continueToStep3" onclick="goToStep3()" disabled>Continue</button>
+        </div>
+
+        <!-- Step 3: Enter Current Units -->
+        <div id="step3" class="card hidden">
+            <h2>Enter current units for each physician</h2>
+            <div id="unitInputList"></div>
+            <button class="btn-primary btn-green" onclick="calculateDistribution()">Calculate Distribution</button>
+        </div>
+
+        <!-- Step 4: Results -->
+        <div id="step4" class="hidden">
+            <!-- Summary Card -->
+            <div class="card">
+                <h2>Morning Assignment Summary</h2>
+                <div class="summary-grid">
+                    <div class="summary-card blue">
+                        <div class="summary-label">Total Current Units</div>
+                        <div class="summary-value" id="totalCurrentUnits">0</div>
+                    </div>
+                    <div class="summary-card green">
+                        <div class="summary-label">Maximum Units</div>
+                        <div class="summary-value" id="maxUnits">0</div>
+                    </div>
+                    <div class="summary-card purple">
+                        <div class="summary-label">Available Units</div>
+                        <div class="summary-value" id="availableUnits">0</div>
+                    </div>
+                    <div class="summary-card orange">
+                        <div class="summary-label">New Patients</div>
+                        <div class="summary-value" id="newPatients">0</div>
+                        <div class="summary-note" id="exactPatients"></div>
+                    </div>
+                </div>
+                <div id="roundingAlert" class="alert alert-yellow hidden"></div>
+                <div id="overCapacityAlert" class="alert alert-red hidden"></div>
+            </div>
+
+            <!-- Distribution Card -->
+            <div class="card">
+                <h2>Patient Distribution & Updated Units</h2>
+                <div class="distribution-list" id="distributionList"></div>
+            </div>
+
+            <!-- Reset Button -->
+            <button class="btn-primary btn-gray" onclick="reset()">
+                <svg style="display: inline; width: 1.25rem; height: 1.25rem; vertical-align: middle; margin-right: 0.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                New Calculation
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let state = {
+            numPhysicians: 4,
+            eveningPhysician: null,
+            physicians: [],
+            darkMode: false,
+            showHistory: false,
+            history: []
+        };
+
+        // Initialize
+        function init() {
+            // Load dark mode preference
+            const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (savedDarkMode) {
+                state.darkMode = true;
+                document.body.className = 'dark';
+                document.getElementById('moonIcon').classList.add('hidden');
+                document.getElementById('sunIcon').classList.remove('hidden');
+            }
+
+            // Load history
+            const savedHistory = localStorage.getItem('hospitalistHistory');
+            if (savedHistory) {
+                state.history = JSON.parse(savedHistory);
+            }
+        }
+
+        // Dark mode toggle
+        function toggleDarkMode() {
+            state.darkMode = !state.darkMode;
+            document.body.className = state.darkMode ? 'dark' : 'light';
+            localStorage.setItem('darkMode', state.darkMode);
+            
+            document.getElementById('moonIcon').classList.toggle('hidden');
+            document.getElementById('sunIcon').classList.toggle('hidden');
+        }
+
+        // History toggle
+        function toggleHistory() {
+            state.showHistory = !state.showHistory;
+            const historyView = document.getElementById('historyView');
+            
+            if (state.showHistory && state.history.length > 0) {
+                historyView.classList.remove('hidden');
+                renderHistory();
+            } else {
+                historyView.classList.add('hidden');
+            }
+        }
+
+        function renderHistory() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = state.history.map((entry, idx) => {
+                const date = new Date(entry.date);
+                const dateStr = date.toLocaleDateString();
+                const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const borderClass = entry.hasOverCapacity ? 'red' : 'blue';
+                
+                return `
+                    <div class="history-item ${borderClass}">
+                        <div class="history-date">${dateStr} at ${timeStr}</div>
+                        <div class="history-summary">
+                            ${entry.roundedPatients} new patients distributed
+                            ${entry.hasOverCapacity ? '<span class="badge badge-red">⚠️ Over Capacity</span>' : ''}
+                        </div>
+                        <div class="history-details">
+                            ${entry.availableUnits} units available • Evening: Physician ${entry.eveningPhysicianId}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Step 1
+        function changePhysicianCount(delta) {
+            state.numPhysicians = Math.max(2, state.numPhysicians + delta);
+            document.getElementById('physicianCount').textContent = state.numPhysicians;
+        }
+
+        function goToStep2() {
+            // Initialize physicians
+            state.physicians = Array.from({ length: state.numPhysicians }, (_, i) => ({
+                id: i + 1,
+                name: `Physician ${i + 1}`,
+                currentUnits: 0
+            }));
+
+            // Render evening physician selection
+            const grid = document.getElementById('eveningPhysicianGrid');
+            grid.innerHTML = state.physicians.map(p => 
+                `<button class="physician-btn" onclick="selectEveningPhysician(${p.id})">Physician ${p.id}</button>`
+            ).join('');
+
+            // Show step 2
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+        }
+
+        function selectEveningPhysician(id) {
+            state.eveningPhysician = id;
+            
+            // Update button styles
+            const buttons = document.querySelectorAll('#eveningPhysicianGrid .physician-btn');
+            buttons.forEach((btn, idx) => {
+                if (idx + 1 === id) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+
+            // Enable continue button
+            document.getElementById('continueToStep3').disabled = false;
+        }
+
+        function goToStep3() {
+            // Render unit inputs
+            const unitList = document.getElementById('unitInputList');
+            unitList.innerHTML = state.physicians.map(p => `
+                <div class="unit-input-row">
+                    <label class="unit-label">
+                        Physician ${p.id}
+                        ${p.id === state.eveningPhysician ? '<span class="badge badge-purple">Evening</span>' : ''}
+                    </label>
+                    <input 
+                        type="number" 
+                        min="0" 
+                        max="19" 
+                        value="0" 
+                        class="unit-input"
+                        id="units-${p.id}"
+                        onchange="updatePhysicianUnits(${p.id}, this.value)"
+                    />
+                    <span class="unit-max">/ 19</span>
+                </div>
+            `).join('');
+
+            // Show step 3
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.remove('hidden');
+        }
+
+        function updatePhysicianUnits(id, value) {
+            const numValue = Math.min(19, Math.max(0, parseInt(value) || 0));
+            const physician = state.physicians.find(p => p.id === id);
+            physician.currentUnits = numValue;
+            document.getElementById(`units-${id}`).value = numValue;
+        }
+
+        function calculateDistribution() {
+            // Filter out evening physician
+            const morningPhysicians = state.physicians.filter(p => p.id !== state.eveningPhysician);
+            
+            // Calculate totals
+            const totalCurrentUnits = state.physicians.reduce((sum, p) => sum + p.currentUnits, 0);
+            const maxUnits = state.physicians.length * 19;
+            const availableUnits = maxUnits - totalCurrentUnits;
+            const exactPatients = availableUnits / 3;
+            const roundedPatients = Math.floor(exactPatients);
+
+            // Create distribution array
+            const distribution = morningPhysicians.map(p => ({ ...p, newPatients: 0 }));
+
+            // Distribute patients
+            for (let i = 0; i < roundedPatients; i++) {
+                // Try to find physicians who won't exceed 19 units
+                let eligible = distribution.filter(p => 
+                    p.currentUnits + (p.newPatients * 3) + 3 <= 19
+                );
+
+                // If no one can accept without exceeding, take everyone
+                if (eligible.length === 0) {
+                    eligible = [...distribution];
+                }
+
+                // Sort by current total load (lowest first)
+                eligible.sort((a, b) => {
+                    const aTotal = a.currentUnits + (a.newPatients * 3);
+                    const bTotal = b.currentUnits + (b.newPatients * 3);
+                    return aTotal - bTotal;
+                });
+
+                // Find all physicians tied for lowest load
+                const lowestLoad = eligible[0].currentUnits + (eligible[0].newPatients * 3);
+                const tiedPhysicians = eligible.filter(p => 
+                    p.currentUnits + (p.newPatients * 3) === lowestLoad
+                );
+
+                // If multiple tied, pick randomly
+                const selectedPhysician = tiedPhysicians.length > 1
+                    ? tiedPhysicians[Math.floor(Math.random() * tiedPhysicians.length)]
+                    : tiedPhysicians[0];
+
+                // Assign to the selected physician
+                const recipient = distribution.find(p => p.id === selectedPhysician.id);
+                recipient.newPatients++;
+            }
+
+            // Update physicians with results
+            state.physicians = state.physicians.map(p => {
+                if (p.id === state.eveningPhysician) {
+                    return { ...p, newPatients: 0, updatedUnits: p.currentUnits, isEvening: true };
+                }
+                const dist = distribution.find(d => d.id === p.id);
+                const updatedUnits = p.currentUnits + (dist.newPatients * 3);
+                return {
+                    ...p,
+                    newPatients: dist.newPatients,
+                    updatedUnits: updatedUnits,
+                    isEvening: false,
+                    overCapacity: updatedUnits > 19,
+                    atCapacity: updatedUnits >= 17 && updatedUnits <= 19
+                };
+            });
+
+            // Save to history
+            const newEntry = {
+                date: new Date().toISOString(),
+                physicians: state.physicians,
+                totalCurrentUnits,
+                maxUnits,
+                availableUnits,
+                exactPatients,
+                roundedPatients,
+                eveningPhysicianId: state.eveningPhysician,
+                hasOverCapacity: state.physicians.some(p => p.overCapacity)
+            };
+
+            state.history = [newEntry, ...state.history].slice(0, 7);
+            localStorage.setItem('hospitalistHistory', JSON.stringify(state.history));
+
+            // Render results
+            renderResults(totalCurrentUnits, maxUnits, availableUnits, exactPatients, roundedPatients);
+
+            // Show step 4
+            document.getElementById('step3').classList.add('hidden');
+            document.getElementById('step4').classList.remove('hidden');
+        }
+
+        function renderResults(totalCurrentUnits, maxUnits, availableUnits, exactPatients, roundedPatients) {
+            // Summary
+            document.getElementById('totalCurrentUnits').textContent = totalCurrentUnits;
+            document.getElementById('maxUnits').textContent = maxUnits;
+            document.getElementById('availableUnits').textContent = availableUnits;
+            document.getElementById('newPatients').textContent = roundedPatients;
+
+            // Exact patients note
+            const exactNote = document.getElementById('exactPatients');
+            if (exactPatients !== roundedPatients) {
+                exactNote.textContent = `Exact: ${exactPatients.toFixed(2)}`;
+            } else {
+                exactNote.textContent = '';
+            }
+
+            // Rounding alert
+            const roundingAlert = document.getElementById('roundingAlert');
+            if (exactPatients !== roundedPatients) {
+                roundingAlert.innerHTML = `<strong>Note:</strong> Exact calculation is ${exactPatients.toFixed(2)} patients. Rounded down to ${roundedPatients} patients.`;
+                roundingAlert.classList.remove('hidden');
+            } else {
+                roundingAlert.classList.add('hidden');
+            }
+
+            // Over capacity alert
+            const overCapacityAlert = document.getElementById('overCapacityAlert');
+            if (state.physicians.some(p => p.overCapacity)) {
+                overCapacityAlert.innerHTML = `<strong>⚠️ Warning:</strong> One or more physicians have been assigned over the 19-unit maximum capacity due to high overall load. Physician(s) with the lowest unit count were prioritized for these assignments.`;
+                overCapacityAlert.classList.remove('hidden');
+            } else {
+                overCapacityAlert.classList.add('hidden');
+            }
+
+            // Distribution list
+            const distributionList = document.getElementById('distributionList');
+            distributionList.innerHTML = state.physicians.map(p => {
+                let className = 'gray';
+                if (p.isEvening) className = 'purple';
+                else if (p.overCapacity) className = 'red';
+                else if (p.newPatients > 0) className = 'green';
+                else if (p.atCapacity) className = 'orange';
+
+                return `
+                    <div class="distribution-item ${className}">
+                        <div>
+                            <div class="physician-name">
+                                Physician ${p.id}
+                                ${p.isEvening ? '<span class="badge badge-purple">Evening</span>' : ''}
+                                ${p.overCapacity ? '<span class="badge badge-red">⚠️ Over Capacity</span>' : ''}
+                                ${!p.isEvening && p.atCapacity && !p.overCapacity && p.newPatients === 0 ? '<span class="badge badge-orange">Near Max</span>' : ''}
+                            </div>
+                            <div class="unit-change">
+                                ${p.currentUnits} → <strong ${p.overCapacity ? 'class="over-capacity-text"' : ''}>${p.updatedUnits}</strong> units
+                                ${p.overCapacity ? `<span class="over-capacity-text"> (exceeds max by ${p.updatedUnits - 19})</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="patient-count">
+                            ${p.isEvening 
+                                ? '<div class="no-admits">No morning admits</div>' 
+                                : `
+                                    <div class="patient-number ${p.overCapacity ? 'red' : ''}">${p.newPatients}</div>
+                                    <div class="patient-label">${p.newPatients === 1 ? 'patient' : 'patients'}</div>
+                                    ${p.atCapacity && p.newPatients === 0 && !p.overCapacity ? '<div class="near-max-text">Near max</div>' : ''}
+                                `
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function reset() {
+            state = {
+                numPhysicians: 4,
+                eveningPhysician: null,
+                physicians: [],
+                darkMode: state.darkMode,
+                showHistory: false,
+                history: state.history
+            };
+
+            document.getElementById('physicianCount').textContent = 4;
+            document.getElementById('step4').classList.add('hidden');
+            document.getElementById('step1').classList.remove('hidden');
+            document.getElementById('historyView').classList.add('hidden');
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
